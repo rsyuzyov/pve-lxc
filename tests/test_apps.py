@@ -11,7 +11,7 @@ from lib.system import System
 
 
 # Создаём тестовый установщик
-class TestInstaller(AppInstaller):
+class MockInstaller(AppInstaller):
     name = "test"
     description = "Test application"
     default_cores = 2
@@ -56,7 +56,7 @@ class TestInstaller(AppInstaller):
 
 
 # Регистрируем тестовый установщик
-AppRegistry.register(TestInstaller)
+AppRegistry.register(MockInstaller)
 
 
 # **Feature: pve-lxc-v2, Property 10: Список приложений полный**
@@ -89,7 +89,7 @@ def test_app_installer_call_order():
     logger = Logger(json_output=True)
     system = System(logger)
     
-    installer = TestInstaller(logger, system, {}, should_fail_validation=False)
+    installer = MockInstaller(logger, system, {}, should_fail_validation=False)
     result = installer.run()
     
     assert result.success
@@ -103,7 +103,7 @@ def test_app_installer_stops_on_validation_error():
     logger = Logger(json_output=True)
     system = System(logger)
     
-    installer = TestInstaller(logger, system, {}, should_fail_validation=True)
+    installer = MockInstaller(logger, system, {}, should_fail_validation=True)
     result = installer.run()
     
     assert not result.success
@@ -118,7 +118,7 @@ def test_install_result_success_has_access_url():
     logger = Logger(json_output=True)
     system = System(logger)
     
-    installer = TestInstaller(logger, system, {})
+    installer = MockInstaller(logger, system, {})
     result = installer.run()
     
     assert result.success
@@ -131,7 +131,7 @@ def test_install_result_failure_has_log_path():
     logger = Logger(json_output=True)
     system = System(logger)
     
-    installer = TestInstaller(logger, system, {}, should_fail_validation=True)
+    installer = MockInstaller(logger, system, {}, should_fail_validation=True)
     result = installer.run()
     
     assert not result.success

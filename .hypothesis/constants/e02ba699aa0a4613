@@ -1,0 +1,4 @@
+# file: /root/run-in-lxc/cli/core/network.py
+# hypothesis_version: 6.148.7
+
+[1.0, '-W', '-c', '-o', '.', '.1', '/', '1', '24', 'addr', 'default', 'inet ([\\d.]+)/(\\d+)', 'ip', 'ping', 'route', 'show']

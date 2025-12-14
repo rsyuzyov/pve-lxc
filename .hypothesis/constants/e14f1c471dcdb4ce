@@ -1,0 +1,4 @@
+# file: /root/run-in-lxc/lib/system.py
+# hypothesis_version: 6.148.7
+
+[420, 493, '-qq', '-y', 'apt-get', 'install', 'systemctl', 'update']

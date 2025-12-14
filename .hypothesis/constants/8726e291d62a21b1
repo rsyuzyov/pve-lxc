@@ -1,0 +1,4 @@
+# file: /root/run-in-lxc/apps/base.py
+# hypothesis_version: 6.148.7
+
+[2048, '/', '/var/log/pve-lxc', 'Configuring', 'Installing', 'Post-install', 'Pre-install', 'Validating', 'base']
