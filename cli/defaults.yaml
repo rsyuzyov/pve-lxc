@@ -1,0 +1,24 @@
+container:
+  cores: 2
+  memory: 2048
+  disk: 10
+  template: "debian-12-standard"
+  storage: "local-lvm"
+
+network:
+  bridge: "vmbr0"
+  ping_timeout: 1.0
+
+bootstrap:
+  locale: "en_US.UTF-8"
+  timezone: "UTC"
+  packages:
+    - curl
+    - wget
+    - git
+    - vim
+    - htop
+
+logging:
+  level: "INFO"
+  json: false

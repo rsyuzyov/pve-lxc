@@ -1,0 +1,7 @@
+app:
+  name: 1c
+  description: "1C:Enterprise Server"
+container:
+  cores: 4
+  memory: 8192
+  disk: 40

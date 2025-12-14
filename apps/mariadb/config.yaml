@@ -1,0 +1,7 @@
+app:
+  name: mariadb
+  description: "MariaDB Database"
+container:
+  cores: 2
+  memory: 2048
+  disk: 20

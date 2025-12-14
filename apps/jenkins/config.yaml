@@ -1,0 +1,7 @@
+app:
+  name: jenkins
+  description: "Jenkins CI/CD Server"
+container:
+  cores: 2
+  memory: 4096
+  disk: 20

@@ -1,0 +1,7 @@
+app:
+  name: prometheus
+  description: "Prometheus Monitoring"
+container:
+  cores: 2
+  memory: 2048
+  disk: 20

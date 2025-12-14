@@ -1,0 +1,7 @@
+app:
+  name: gitlab-runner
+  description: "GitLab Runner"
+container:
+  cores: 2
+  memory: 2048
+  disk: 20

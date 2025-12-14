@@ -1,0 +1,7 @@
+app:
+  name: kafka
+  description: "Apache Kafka"
+container:
+  cores: 2
+  memory: 4096
+  disk: 20

@@ -1,0 +1,7 @@
+app:
+  name: rabbitmq
+  description: "RabbitMQ Message Broker"
+container:
+  cores: 2
+  memory: 2048
+  disk: 10

@@ -1,0 +1,7 @@
+app:
+  name: zoneminder
+  description: "ZoneMinder Video Surveillance"
+container:
+  cores: 4
+  memory: 4096
+  disk: 40

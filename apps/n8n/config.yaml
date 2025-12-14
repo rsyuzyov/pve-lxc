@@ -1,0 +1,7 @@
+app:
+  name: n8n
+  description: "n8n Workflow Automation"
+container:
+  cores: 2
+  memory: 2048
+  disk: 10

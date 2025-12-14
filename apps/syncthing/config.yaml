@@ -1,0 +1,7 @@
+app:
+  name: syncthing
+  description: "Syncthing File Sync"
+container:
+  cores: 1
+  memory: 512
+  disk: 20

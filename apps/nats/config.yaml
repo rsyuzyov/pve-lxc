@@ -1,0 +1,7 @@
+app:
+  name: nats
+  description: "NATS Message Broker"
+container:
+  cores: 1
+  memory: 512
+  disk: 8

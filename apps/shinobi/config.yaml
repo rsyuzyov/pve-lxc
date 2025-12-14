@@ -1,0 +1,7 @@
+app:
+  name: shinobi
+  description: "Shinobi Video Surveillance"
+container:
+  cores: 4
+  memory: 4096
+  disk: 40

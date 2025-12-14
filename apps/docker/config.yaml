@@ -1,0 +1,14 @@
+app:
+  name: docker
+  description: "Docker Engine"
+
+container:
+  cores: 2
+  memory: 2048
+  disk: 20
+
+parameters:
+  - name: compose
+    type: bool
+    default: true
+    description: "Установить Docker Compose"

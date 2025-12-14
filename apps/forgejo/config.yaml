@@ -1,0 +1,7 @@
+app:
+  name: forgejo
+  description: "Forgejo Git Server"
+container:
+  cores: 2
+  memory: 1024
+  disk: 20

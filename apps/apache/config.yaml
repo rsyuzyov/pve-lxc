@@ -1,0 +1,7 @@
+app:
+  name: apache
+  description: "Apache HTTP Server"
+container:
+  cores: 1
+  memory: 512
+  disk: 8

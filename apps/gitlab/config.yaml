@@ -1,0 +1,22 @@
+app:
+  name: gitlab
+  description: "GitLab CE - DevOps платформа"
+
+container:
+  cores: 4
+  memory: 8192
+  disk: 40
+
+install:
+  external_url: "http://gitlab.local"
+  smtp_enabled: false
+
+parameters:
+  - name: external_url
+    type: string
+    required: true
+    description: "URL для доступа к GitLab"
+  - name: smtp_enabled
+    type: bool
+    default: false
+    description: "Включить отправку email"

@@ -1,0 +1,7 @@
+app:
+  name: nginx
+  description: "Nginx Web Server"
+container:
+  cores: 1
+  memory: 512
+  disk: 8

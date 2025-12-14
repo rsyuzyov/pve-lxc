@@ -1,0 +1,7 @@
+app:
+  name: mongodb
+  description: "MongoDB Database"
+container:
+  cores: 2
+  memory: 2048
+  disk: 20

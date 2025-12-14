@@ -1,0 +1,14 @@
+app:
+  name: postgres
+  description: "PostgreSQL Database"
+
+container:
+  cores: 2
+  memory: 2048
+  disk: 20
+
+parameters:
+  - name: version
+    type: string
+    default: "16"
+    description: "Версия PostgreSQL"
