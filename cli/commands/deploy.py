@@ -7,12 +7,46 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(__file__).rsplit("/", 4)[0])
 from lib.logger import Logger
-from lib.system import System
+from lib.system import System, CommandResult
 from lib.config import ConfigLoader
 from lib.validation import validate_ctid, validate_name, ValidationError
 from cli.core.pve import PVE
-from cli.core.container import create_container
+from cli.core.container import create_container, bootstrap_container
 from apps.registry import AppRegistry
+
+
+class RemoteSystem:
+    """System для выполнения команд в контейнере через pct exec."""
+    
+    def __init__(self, logger: Logger, pve, ctid: int):
+        self.logger = logger
+        self.pve = pve
+        self.ctid = ctid
+    
+    def run(self, cmd: list[str], check: bool = True, capture: bool = True) -> CommandResult:
+        """Выполнить команду в контейнере."""
+        self.logger.debug(f"Running: {' '.join(cmd)}")
+        result = self.pve.exec(self.ctid, cmd)
+        if check and not result.success:
+            self.logger.error(f"Command failed: {' '.join(cmd)}", stderr=result.stderr)
+        return result
+    
+    def apt_update(self) -> CommandResult:
+        """Обновить списки пакетов."""
+        self.logger.info("Updating package lists")
+        return self.run(["apt-get", "update", "-qq"])
+    
+    def apt_install(self, packages: list[str]) -> CommandResult:
+        """Установить пакеты."""
+        self.logger.info(f"Installing packages: {', '.join(packages)}")
+        cmd = ["apt-get", "install", "-y", "-qq"] + packages
+        return self.run(cmd)
+    
+    def systemctl(self, action: str, service: str) -> CommandResult:
+        """Управление systemd сервисом."""
+        self.logger.info(f"Systemctl {action} {service}")
+        return self.run(["systemctl", action, service])
+
 
 app = typer.Typer()
 
@@ -78,6 +112,9 @@ def deploy(
         
         ctid = result.ctid
         logger.success(f"Container {ctid} created")
+        
+        # Bootstrap контейнера
+        bootstrap_container(logger, ctid)
     
     if not ctid:
         logger.error("Specify --container or use --create")
@@ -94,13 +131,17 @@ def deploy(
     
     # Создаём установщик и запускаем
     pve = PVE(logger)
-    system = System(logger)
     
-    # Копируем lib в контейнер
-    lib_path = Path(__file__).parent.parent.parent / "lib"
-    pve.exec(ctid, ["mkdir", "-p", "/opt/pve-lxc/lib"])
-    for py_file in lib_path.glob("*.py"):
-        pve.push(ctid, py_file, Path(f"/opt/pve-lxc/lib/{py_file.name}"))
+    # Ждём готовности контейнера
+    import time
+    for _ in range(30):
+        result = pve.exec(ctid, ["true"])
+        if result.success:
+            break
+        time.sleep(1)
+    
+    # Создаём RemoteSystem для выполнения команд в контейнере
+    system = RemoteSystem(logger, pve, ctid)
     
     # Запускаем установку
     installer = installer_class(logger, system, config)

@@ -43,9 +43,19 @@ def create_container(
     memory = memory or defaults.get("memory", 2048)
     disk = disk or defaults.get("disk", 10)
     template = template or defaults.get("template", "debian-12-standard")
-    storage = storage or defaults.get("storage", "local-lvm")
     
     pve = PVE(logger)
+    
+    # Автоопределение storage если не указан
+    if not storage:
+        storage = defaults.get("storage")
+        if not storage or storage == "local-lvm":
+            detected = pve.find_rootfs_storage()
+            if detected:
+                storage = detected
+                logger.debug(f"Auto-detected storage: {storage}")
+            else:
+                storage = "local-lvm"  # fallback
     network = Network(logger)
     
     # Получаем CTID
@@ -60,8 +70,10 @@ def create_container(
         net_ip = "dhcp"
         resolved_ip = None
 
-    # Формируем путь к шаблону
-    template_path = f"local:vztmpl/{template}_amd64.tar.zst"
+    # Ищем шаблон
+    template_path = pve.find_template(template)
+    if not template_path:
+        return CreateResult(success=False, message=f"Template '{template}' not found")
     
     # Создаём контейнер
     success = pve.create(

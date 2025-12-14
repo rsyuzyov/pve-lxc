@@ -205,8 +205,70 @@ class PVE:
                     templates.append(parts[0])
         return templates
 
+    def find_template(self, name: str, storage: str = None) -> Optional[str]:
+        """Найти шаблон по имени (например 'debian-12-standard')."""
+        if not storage:
+            storage = self.find_template_storage() or "local"
+        
+        templates = self.list_templates(storage)
+        for tpl in templates:
+            # tpl = "pool2-dir:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
+            filename = tpl.split("/")[-1] if "/" in tpl else tpl
+            if filename.startswith(name):
+                self.logger.debug(f"Found template: {tpl}")
+                return tpl
+        
+        return None
+
     def download_template(self, template: str, storage: str = "local") -> bool:
         """Скачать шаблон."""
         self.logger.step(f"Downloading template {template}")
         result = self._run(["pveam", "download", storage, template])
         return result.success
+
+    def _get_storages(self) -> list[dict]:
+        """Получить список хранилищ."""
+        result = self._run(["pvesh", "get", "/storage", "--output-format", "json"])
+        if not result.success:
+            return []
+        
+        import json
+        try:
+            return json.loads(result.stdout)
+        except json.JSONDecodeError:
+            return []
+
+    def find_rootfs_storage(self) -> Optional[str]:
+        """Найти первое хранилище, подходящее для rootfs контейнеров."""
+        storages = self._get_storages()
+        
+        # Ищем storage с content=rootdir, не отключённый
+        for storage in storages:
+            if storage.get("disable"):
+                continue
+            content = storage.get("content", "")
+            if "rootdir" in content:
+                self.logger.debug(f"Found rootfs storage: {storage['storage']}")
+                return storage["storage"]
+        
+        # Fallback: первый включённый storage
+        for storage in storages:
+            if not storage.get("disable"):
+                return storage["storage"]
+        
+        return None
+
+    def find_template_storage(self) -> Optional[str]:
+        """Найти хранилище с шаблонами контейнеров."""
+        storages = self._get_storages()
+        
+        # Ищем storage с content=vztmpl, не отключённый
+        for storage in storages:
+            if storage.get("disable"):
+                continue
+            content = storage.get("content", "")
+            if "vztmpl" in content:
+                self.logger.debug(f"Found template storage: {storage['storage']}")
+                return storage["storage"]
+        
+        return None
