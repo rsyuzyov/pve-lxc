@@ -1,0 +1,49 @@
+app:
+  name: supabase
+  description: "Supabase - Open Source Firebase Alternative"
+
+container:
+  cores: 4
+  memory: 4096
+  disk: 30
+
+parameters:
+  - name: domain
+    type: string
+    required: true
+    description: "Домен для доступа к Supabase (например: supabase.example.com)"
+  
+  - name: jwt_secret
+    type: string
+    required: false
+    description: "JWT секрет (генерируется автоматически если не указан)"
+  
+  - name: postgres_password
+    type: string
+    required: false
+    description: "Пароль PostgreSQL (генерируется автоматически если не указан)"
+  
+  - name: dashboard_password
+    type: string
+    required: false
+    description: "Пароль для Studio Dashboard (генерируется автоматически если не указан)"
+  
+  - name: smtp_host
+    type: string
+    required: false
+    description: "SMTP сервер для отправки email"
+  
+  - name: smtp_port
+    type: int
+    default: 587
+    description: "SMTP порт"
+  
+  - name: smtp_user
+    type: string
+    required: false
+    description: "SMTP пользователь"
+  
+  - name: smtp_pass
+    type: string
+    required: false
+    description: "SMTP пароль"

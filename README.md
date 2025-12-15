@@ -58,8 +58,11 @@ pve-lxc destroy 101 --force
 | postgres | PostgreSQL Database |
 | prometheus | Prometheus Monitoring |
 | rabbitmq | RabbitMQ Message Broker |
+| railway | Railway CLI |
 | shinobi | Shinobi Surveillance |
+| supabase | Supabase (Firebase Alternative) |
 | syncthing | Syncthing File Sync |
+| vercel | Vercel CLI |
 | zoneminder | ZoneMinder Surveillance |
 
 ## Конфигурация

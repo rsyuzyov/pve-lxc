@@ -1,0 +1,14 @@
+app:
+  name: railway
+  description: "Railway CLI - Deploy and manage Railway projects"
+
+container:
+  cores: 2
+  memory: 2048
+  disk: 10
+
+parameters:
+  - name: token
+    type: string
+    required: false
+    description: "Railway API token для автоматической авторизации"

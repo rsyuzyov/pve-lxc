@@ -1,0 +1,19 @@
+app:
+  name: vercel
+  description: "Vercel CLI - Deploy and manage Vercel projects"
+
+container:
+  cores: 2
+  memory: 2048
+  disk: 10
+
+parameters:
+  - name: token
+    type: string
+    required: false
+    description: "Vercel API token для автоматической авторизации"
+  
+  - name: scope
+    type: string
+    required: false
+    description: "Team scope (slug или ID команды)"
