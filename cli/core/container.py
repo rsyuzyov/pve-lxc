@@ -30,7 +30,8 @@ def create_container(
     gateway: str = None,
     template: str = None,
     storage: str = None,
-    gpu: bool = False
+    gpu: bool = False,
+    ctid: int = None
 ) -> CreateResult:
     """Создать контейнер с автоматическим выбором параметров."""
     
@@ -59,7 +60,8 @@ def create_container(
     network = Network(logger)
     
     # Получаем CTID
-    ctid = pve.next_ctid()
+    if not ctid:
+        ctid = pve.next_ctid()
     
     # Разрешаем IP
     if ip:

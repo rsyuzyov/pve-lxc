@@ -56,11 +56,13 @@ def deploy(
     app_name: str = typer.Option(..., "--app", "-a", help="Имя приложения для установки"),
     container: Optional[int] = typer.Option(None, "--container", "-c", help="CTID существующего контейнера"),
     create: bool = typer.Option(False, "--create", help="Создать новый контейнер"),
+    ctid: Optional[int] = typer.Option(None, "--ctid", help="CTID для нового контейнера (при --create)"),
     name: Optional[str] = typer.Option(None, "--name", "-n", help="Имя нового контейнера (при --create)"),
     cores: Optional[int] = typer.Option(None, "--cores", help="Количество ядер CPU"),
     memory: Optional[int] = typer.Option(None, "--memory", help="Память в МБ"),
     disk: Optional[int] = typer.Option(None, "--disk", help="Размер диска в ГБ"),
     ip: Optional[str] = typer.Option(None, "--ip", help="IP адрес"),
+    gateway: Optional[str] = typer.Option(None, "--gateway", help="Шлюз"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
 ):
     """Развернуть приложение в LXC контейнере."""
@@ -86,7 +88,8 @@ def deploy(
         raise typer.Exit(1)
 
     # Определяем CTID
-    ctid = container
+    target_ctid = container  # существующий контейнер
+    new_ctid = ctid  # желаемый CTID для нового контейнера
     
     if create:
         if not name:
@@ -103,20 +106,22 @@ def deploy(
             cores=app_cores,
             memory=app_memory,
             disk=app_disk,
-            ip=ip
+            ip=ip,
+            gateway=gateway,
+            ctid=new_ctid
         )
         
         if not result.success:
             logger.error(f"Failed to create container: {result.message}")
             raise typer.Exit(1)
         
-        ctid = result.ctid
-        logger.success(f"Container {ctid} created")
+        target_ctid = result.ctid
+        logger.success(f"Container {target_ctid} created")
         
         # Bootstrap контейнера
-        bootstrap_container(logger, ctid)
+        bootstrap_container(logger, target_ctid)
     
-    if not ctid:
+    if not target_ctid:
         logger.error("Specify --container or use --create")
         raise typer.Exit(1)
     
@@ -135,13 +140,13 @@ def deploy(
     # Ждём готовности контейнера
     import time
     for _ in range(30):
-        result = pve.exec(ctid, ["true"])
+        result = pve.exec(target_ctid, ["true"])
         if result.success:
             break
         time.sleep(1)
     
     # Создаём RemoteSystem для выполнения команд в контейнере
-    system = RemoteSystem(logger, pve, ctid)
+    system = RemoteSystem(logger, pve, target_ctid)
     
     # Запускаем установку
     installer = installer_class(logger, system, config)
@@ -149,7 +154,7 @@ def deploy(
     
     if result.success:
         logger.result(True, {
-            "ctid": ctid,
+            "ctid": target_ctid,
             "app": app_name,
             "access_url": result.access_url,
             "credentials": result.credentials

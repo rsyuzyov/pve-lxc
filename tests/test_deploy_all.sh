@@ -37,7 +37,7 @@ test_app() {
     
     cleanup
     
-    if $VENV_PYTHON "$CLI" deploy --app "$app" --create --name "test-$app" $extra_args 2>&1 | tee -a "$LOG_FILE"; then
+    if $VENV_PYTHON "$CLI" deploy --app "$app" --create --ctid $CTID --name "test-$app" $extra_args 2>&1 | tee -a "$LOG_FILE"; then
         log "✓ $app ($test_type) - OK"
         return 0
     else
