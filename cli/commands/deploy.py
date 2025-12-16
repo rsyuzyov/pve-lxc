@@ -13,6 +13,7 @@ from lib.validation import validate_ctid, validate_name, ValidationError
 from cli.core.pve import PVE
 from cli.core.container import create_container, bootstrap_container
 from cli.core.host_manager import HostManager
+from cli.core.yaml_config import load_yaml_config, merge_config
 from apps.registry import AppRegistry
 
 
@@ -62,7 +63,7 @@ app = typer.Typer()
 @app.command()
 def deploy(
     ctx: typer.Context,
-    app_name: str = typer.Option(..., "--app", "-a", help="Имя приложения для установки"),
+    app_name: Optional[str] = typer.Option(None, "--app", "-a", help="Имя приложения для установки"),
     container: Optional[int] = typer.Option(None, "--container", "-c", help="CTID существующего контейнера"),
     create: bool = typer.Option(False, "--create", help="Создать новый контейнер"),
     ctid: Optional[int] = typer.Option(None, "--ctid", help="CTID для нового контейнера (при --create)"),
@@ -73,9 +74,37 @@ def deploy(
     ip: Optional[str] = typer.Option(None, "--ip", help="IP адрес"),
     gateway: Optional[str] = typer.Option(None, "--gateway", help="Шлюз"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
+    config: Optional[str] = typer.Option(None, "--config", "-C", help="Путь к YAML файлу с параметрами"),
 ):
     """Развернуть приложение в LXC контейнере."""
     logger = Logger(json_output=json_output)
+    
+    # Загружаем yaml и мержим с CLI
+    try:
+        yaml_cfg = load_yaml_config(config)
+    except FileNotFoundError as e:
+        logger.error(str(e))
+        raise typer.Exit(1)
+    
+    cfg = merge_config(yaml_cfg, app=app_name, container=container, create=create,
+                       ctid=ctid, name=name, cores=cores, memory=memory, 
+                       disk=disk, ip=ip, gateway=gateway)
+    
+    app_name = cfg.get("app")
+    container = cfg.get("container")
+    create = cfg.get("create", False)
+    ctid = cfg.get("ctid")
+    name = cfg.get("name")
+    cores = cfg.get("cores")
+    memory = cfg.get("memory")
+    disk = cfg.get("disk")
+    ip = cfg.get("ip")
+    gateway = cfg.get("gateway")
+    
+    if not app_name:
+        logger.error("App name is required (--app or in config)")
+        raise typer.Exit(1)
+    
     logger.set_context(command="deploy", app=app_name)
     
     # Получаем executor из контекста (--host)

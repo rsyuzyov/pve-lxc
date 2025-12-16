@@ -1,6 +1,7 @@
 """Команда destroy - удаление LXC контейнера."""
 
 import typer
+from typing import Optional
 
 import sys
 sys.path.insert(0, str(__file__).rsplit("/", 4)[0])
@@ -9,6 +10,7 @@ from lib.validation import validate_ctid, ValidationError
 from cli.core.pve import PVE
 from cli.core.container import destroy_container
 from cli.core.host_manager import HostManager
+from cli.core.yaml_config import load_yaml_config, merge_config
 
 app = typer.Typer()
 
@@ -23,12 +25,28 @@ def get_executor_from_context(ctx: typer.Context):
 @app.command()
 def destroy(
     ctx: typer.Context,
-    ctid: int = typer.Argument(..., help="CTID контейнера"),
+    ctid: Optional[int] = typer.Argument(None, help="CTID контейнера"),
     force: bool = typer.Option(False, "--force", "-f", help="Удалить без подтверждения"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
+    config: Optional[str] = typer.Option(None, "--config", "-C", help="Путь к YAML файлу с параметрами"),
 ):
     """Удалить LXC контейнер."""
     logger = Logger(json_output=json_output)
+    
+    # Загружаем yaml и мержим с CLI
+    try:
+        yaml_cfg = load_yaml_config(config)
+    except FileNotFoundError as e:
+        logger.error(str(e))
+        raise typer.Exit(1)
+    
+    cfg = merge_config(yaml_cfg, ctid=ctid, force=force)
+    ctid = cfg.get("ctid")
+    force = cfg.get("force", False)
+    
+    if ctid is None:
+        logger.error("CTID is required (argument or in config)")
+        raise typer.Exit(1)
     
     try:
         validate_ctid(ctid)

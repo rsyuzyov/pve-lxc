@@ -9,6 +9,7 @@ from lib.logger import Logger
 from lib.validation import validate_name, validate_ip, validate_resources, ValidationError
 from cli.core.container import create_container
 from cli.core.host_manager import HostManager
+from cli.core.yaml_config import load_yaml_config, merge_config
 
 app = typer.Typer()
 
@@ -23,7 +24,7 @@ def get_executor_from_context(ctx: typer.Context):
 @app.command()
 def create(
     ctx: typer.Context,
-    name: str = typer.Option(..., "--name", "-n", help="Имя контейнера"),
+    name: Optional[str] = typer.Option(None, "--name", "-n", help="Имя контейнера"),
     cores: Optional[int] = typer.Option(None, "--cores", "-c", help="Количество ядер CPU"),
     memory: Optional[int] = typer.Option(None, "--memory", "-m", help="Память в МБ"),
     disk: Optional[int] = typer.Option(None, "--disk", "-d", help="Размер диска в ГБ"),
@@ -31,9 +32,33 @@ def create(
     gateway: Optional[str] = typer.Option(None, "--gateway", "-g", help="Gateway"),
     gpu: bool = typer.Option(False, "--gpu", help="Включить GPU passthrough"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
+    config: Optional[str] = typer.Option(None, "--config", "-C", help="Путь к YAML файлу с параметрами"),
 ):
     """Создать LXC контейнер."""
     logger = Logger(json_output=json_output)
+    
+    # Загружаем yaml и мержим с CLI
+    try:
+        yaml_cfg = load_yaml_config(config)
+    except FileNotFoundError as e:
+        logger.error(str(e))
+        raise typer.Exit(1)
+    
+    cfg = merge_config(yaml_cfg, name=name, cores=cores, memory=memory, 
+                       disk=disk, ip=ip, gateway=gateway, gpu=gpu)
+    
+    # Извлекаем параметры
+    name = cfg.get("name")
+    cores = cfg.get("cores")
+    memory = cfg.get("memory")
+    disk = cfg.get("disk")
+    ip = cfg.get("ip")
+    gateway = cfg.get("gateway")
+    gpu = cfg.get("gpu", False)
+    
+    if not name:
+        logger.error("Name is required (--name or in config)")
+        raise typer.Exit(1)
     
     try:
         # Валидация

@@ -45,14 +45,27 @@ def create_venv(project_dir: Path):
     subprocess.run([str(pip_path), 'install', '-r', str(req_path)], check=True)
 
 
+def create_symlink(project_dir: Path):
+    """Создаёт симлинк в /usr/local/bin."""
+    src = project_dir / 'pve-lxc'
+    dst = Path('/usr/local/bin/pve-lxc')
+    
+    if dst.exists() or dst.is_symlink():
+        dst.unlink()
+    
+    print_step(f"Создание симлинка: {dst} -> {src}")
+    dst.symlink_to(src)
+
+
 def main():
     check_python_version()
     
     project_dir = Path(__file__).parent.resolve()
     create_venv(project_dir)
+    create_symlink(project_dir)
     
     print_info("Установка завершена")
-    print_info("Запуск: ./pve-lxc --help")
+    print_info("Запуск: pve-lxc --help")
 
 
 if __name__ == '__main__':

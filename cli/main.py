@@ -36,7 +36,7 @@ app.command("deploy")(deploy)
 app.add_typer(host_app, name="host")
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Подробный вывод"),
@@ -48,6 +48,9 @@ def main(
     ctx.obj["verbose"] = verbose
     ctx.obj["json_output"] = json_output
     ctx.obj["host"] = host
+    
+    if ctx.invoked_subcommand is None:
+        typer.echo(ctx.get_help())
 
 
 def run():
