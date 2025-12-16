@@ -33,8 +33,14 @@ def create(
     gpu: bool = typer.Option(False, "--gpu", help="Включить GPU passthrough"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
     config: Optional[str] = typer.Option(None, "--config", "-C", help="Путь к YAML файлу с параметрами"),
+    help_flag: bool = typer.Option(False, "--help", "-h", is_eager=True, help="Показать справку"),
 ):
     """Создать LXC контейнер."""
+    # Показываем help если нет параметров
+    if not any([name, config]):
+        typer.echo(ctx.get_help())
+        raise typer.Exit(0)
+    
     logger = Logger(json_output=json_output)
     
     # Загружаем yaml и мержим с CLI

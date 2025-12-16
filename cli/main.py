@@ -21,7 +21,6 @@ from cli.commands.host import host_app
 app = typer.Typer(
     name="pve-lxc",
     help="Управление LXC контейнерами в Proxmox VE",
-    add_completion=False
 )
 
 

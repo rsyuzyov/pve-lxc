@@ -75,8 +75,14 @@ def deploy(
     gateway: Optional[str] = typer.Option(None, "--gateway", help="Шлюз"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
     config: Optional[str] = typer.Option(None, "--config", "-C", help="Путь к YAML файлу с параметрами"),
+    help_flag: bool = typer.Option(False, "--help", "-h", is_eager=True, help="Показать справку"),
 ):
     """Развернуть приложение в LXC контейнере."""
+    # Показываем help если нет параметров
+    if not any([app_name, config]):
+        typer.echo(ctx.get_help())
+        raise typer.Exit(0)
+    
     logger = Logger(json_output=json_output)
     
     # Загружаем yaml и мержим с CLI

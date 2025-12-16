@@ -16,8 +16,16 @@ from lib.exceptions import HostNotFoundError
 console = Console()
 host_app = typer.Typer(
     name="host",
-    help="Управление PVE хостами"
+    help="Управление PVE хостами",
+    invoke_without_command=True
 )
+
+
+@host_app.callback()
+def host_callback(ctx: typer.Context):
+    """Управление PVE хостами."""
+    if ctx.invoked_subcommand is None:
+        typer.echo(ctx.get_help())
 
 
 def get_host_manager() -> HostManager:

@@ -29,8 +29,14 @@ def destroy(
     force: bool = typer.Option(False, "--force", "-f", help="Удалить без подтверждения"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
     config: Optional[str] = typer.Option(None, "--config", "-C", help="Путь к YAML файлу с параметрами"),
+    help_flag: bool = typer.Option(False, "--help", "-h", is_eager=True, help="Показать справку"),
 ):
     """Удалить LXC контейнер."""
+    # Показываем help если нет параметров
+    if ctid is None and config is None:
+        typer.echo(ctx.get_help())
+        raise typer.Exit(0)
+    
     logger = Logger(json_output=json_output)
     
     # Загружаем yaml и мержим с CLI
