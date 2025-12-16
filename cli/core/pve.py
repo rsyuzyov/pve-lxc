@@ -4,12 +4,13 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 import re
-import subprocess
+import tempfile
 
 import sys
 sys.path.insert(0, str(__file__).rsplit("/", 3)[0])
 from lib.logger import Logger
 from lib.system import CommandResult
+from cli.core.executor import CommandExecutor, LocalExecutor
 
 
 @dataclass
@@ -27,18 +28,14 @@ class Container:
 class PVE:
     """Работа с Proxmox VE."""
 
-    def __init__(self, logger: Logger):
+    def __init__(self, logger: Logger, executor: CommandExecutor = None):
         self.logger = logger
+        self.executor = executor or LocalExecutor()
 
     def _run(self, cmd: list[str], check: bool = True) -> CommandResult:
-        """Выполнить команду."""
+        """Выполнить команду через executor."""
         self.logger.debug(f"PVE: {' '.join(cmd)}")
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        return CommandResult(
-            returncode=result.returncode,
-            stdout=result.stdout or "",
-            stderr=result.stderr or ""
-        )
+        return self.executor.run(cmd, check)
 
     def create(
         self,
@@ -115,8 +112,23 @@ class PVE:
 
     def push(self, ctid: int, src: Path, dst: Path) -> bool:
         """Скопировать файл в контейнер."""
-        result = self._run(["pct", "push", str(ctid), str(src), str(dst)])
-        return result.success
+        # Для удалённого executor сначала копируем файл на хост, потом в контейнер
+        if isinstance(self.executor, LocalExecutor):
+            result = self._run(["pct", "push", str(ctid), str(src), str(dst)])
+            return result.success
+        else:
+            # Копируем файл на удалённый хост во временную директорию
+            remote_tmp = Path(f"/tmp/pve-lxc-{src.name}")
+            if not self.executor.push_file(src, remote_tmp):
+                return False
+            
+            # Затем используем pct push на удалённом хосте
+            result = self._run(["pct", "push", str(ctid), str(remote_tmp), str(dst)])
+            
+            # Удаляем временный файл
+            self.executor.run(["rm", "-f", str(remote_tmp)])
+            
+            return result.success
 
     def list_containers(self) -> list[Container]:
         """Получить список контейнеров."""

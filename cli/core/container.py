@@ -31,7 +31,8 @@ def create_container(
     template: str = None,
     storage: str = None,
     gpu: bool = False,
-    ctid: int = None
+    ctid: int = None,
+    executor = None
 ) -> CreateResult:
     """Создать контейнер с автоматическим выбором параметров."""
     
@@ -45,7 +46,7 @@ def create_container(
     disk = disk or defaults.get("disk", 10)
     template = template or defaults.get("template", "debian-12-standard")
     
-    pve = PVE(logger)
+    pve = PVE(logger, executor=executor)
     
     # Автоопределение storage если не указан
     if not storage:
@@ -109,18 +110,18 @@ def create_container(
     )
 
 
-def destroy_container(logger: Logger, ctid: int, force: bool = False) -> bool:
+def destroy_container(logger: Logger, ctid: int, force: bool = False, executor = None) -> bool:
     """Удалить контейнер."""
-    pve = PVE(logger)
+    pve = PVE(logger, executor=executor)
     return pve.destroy(ctid, force=force)
 
 
-def bootstrap_container(logger: Logger, ctid: int) -> bool:
+def bootstrap_container(logger: Logger, ctid: int, executor = None) -> bool:
     """Выполнить базовую настройку контейнера."""
     config = ConfigLoader().load_user_config().merge()
     bootstrap_config = config.get("bootstrap", {})
     
-    pve = PVE(logger)
+    pve = PVE(logger, executor=executor)
     
     # Настройка locale
     locale = bootstrap_config.get("locale", "en_US.UTF-8")

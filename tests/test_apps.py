@@ -131,7 +131,7 @@ def test_install_result_failure_has_log_path():
     logger = Logger(json_output=True)
     system = System(logger)
     
-    installer = MockInstaller(lrun-in-lxcogger, system, {}, should_fail_validation=True)
+    installer = MockInstaller(logger, system, {}, should_fail_validation=True)
     result = installer.run()
     
     assert not result.success

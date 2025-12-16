@@ -12,7 +12,15 @@ from lib.config import ConfigLoader
 from lib.validation import validate_ctid, validate_name, ValidationError
 from cli.core.pve import PVE
 from cli.core.container import create_container, bootstrap_container
+from cli.core.host_manager import HostManager
 from apps.registry import AppRegistry
+
+
+def get_executor_from_context(ctx: typer.Context):
+    """Получить executor из контекста."""
+    host = ctx.obj.get("host") if ctx.obj else None
+    manager = HostManager()
+    return manager.get_executor(host)
 
 
 class RemoteSystem:
@@ -53,6 +61,7 @@ app = typer.Typer()
 
 @app.command()
 def deploy(
+    ctx: typer.Context,
     app_name: str = typer.Option(..., "--app", "-a", help="Имя приложения для установки"),
     container: Optional[int] = typer.Option(None, "--container", "-c", help="CTID существующего контейнера"),
     create: bool = typer.Option(False, "--create", help="Создать новый контейнер"),
@@ -68,6 +77,9 @@ def deploy(
     """Развернуть приложение в LXC контейнере."""
     logger = Logger(json_output=json_output)
     logger.set_context(command="deploy", app=app_name)
+    
+    # Получаем executor из контекста (--host)
+    executor = get_executor_from_context(ctx)
     
     # Проверяем что приложение существует
     installer_class = AppRegistry.get(app_name)
@@ -108,7 +120,8 @@ def deploy(
             disk=app_disk,
             ip=ip,
             gateway=gateway,
-            ctid=new_ctid
+            ctid=new_ctid,
+            executor=executor
         )
         
         if not result.success:
@@ -119,7 +132,7 @@ def deploy(
         logger.success(f"Container {target_ctid} created")
         
         # Bootstrap контейнера
-        bootstrap_container(logger, target_ctid)
+        bootstrap_container(logger, target_ctid, executor=executor)
     
     if not target_ctid:
         logger.error("Specify --container or use --create")
@@ -135,7 +148,7 @@ def deploy(
     )
     
     # Создаём установщик и запускаем
-    pve = PVE(logger)
+    pve = PVE(logger, executor=executor)
     
     # Ждём готовности контейнера
     import time

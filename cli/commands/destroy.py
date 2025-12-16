@@ -8,12 +8,21 @@ from lib.logger import Logger
 from lib.validation import validate_ctid, ValidationError
 from cli.core.pve import PVE
 from cli.core.container import destroy_container
+from cli.core.host_manager import HostManager
 
 app = typer.Typer()
 
 
+def get_executor_from_context(ctx: typer.Context):
+    """Получить executor из контекста."""
+    host = ctx.obj.get("host") if ctx.obj else None
+    manager = HostManager()
+    return manager.get_executor(host)
+
+
 @app.command()
 def destroy(
+    ctx: typer.Context,
     ctid: int = typer.Argument(..., help="CTID контейнера"),
     force: bool = typer.Option(False, "--force", "-f", help="Удалить без подтверждения"),
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
@@ -29,8 +38,11 @@ def destroy(
     
     logger.set_context(command="destroy", ctid=ctid)
     
+    # Получаем executor из контекста (--host)
+    executor = get_executor_from_context(ctx)
+    
     # Проверяем существование контейнера
-    pve = PVE(logger)
+    pve = PVE(logger, executor=executor)
     container = pve.get_container(ctid)
     
     if not container:
@@ -45,7 +57,7 @@ def destroy(
             raise typer.Exit(0)
         force = True
     
-    success = destroy_container(logger, ctid, force=force)
+    success = destroy_container(logger, ctid, force=force, executor=executor)
     
     if success:
         logger.result(True, {"ctid": ctid, "message": f"Container {ctid} destroyed"})

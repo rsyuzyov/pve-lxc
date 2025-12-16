@@ -8,19 +8,31 @@ import sys
 sys.path.insert(0, str(__file__).rsplit("/", 4)[0])
 from lib.logger import Logger
 from cli.core.pve import PVE
+from cli.core.host_manager import HostManager
 
 app = typer.Typer()
 
 
+def get_executor_from_context(ctx: typer.Context):
+    """Получить executor из контекста."""
+    host = ctx.obj.get("host") if ctx.obj else None
+    manager = HostManager()
+    return manager.get_executor(host)
+
+
 @app.command("list")
 def list_containers(
+    ctx: typer.Context,
     json_output: bool = typer.Option(False, "--json", help="Вывод в JSON формате"),
 ):
     """Показать список LXC контейнеров."""
     logger = Logger(json_output=json_output)
     logger.set_context(command="list")
     
-    pve = PVE(logger)
+    # Получаем executor из контекста (--host)
+    executor = get_executor_from_context(ctx)
+    
+    pve = PVE(logger, executor=executor)
     containers = pve.list_containers()
     
     if json_output:

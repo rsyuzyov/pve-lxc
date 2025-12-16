@@ -8,12 +8,21 @@ sys.path.insert(0, str(__file__).rsplit("/", 4)[0])
 from lib.logger import Logger
 from lib.validation import validate_name, validate_ip, validate_resources, ValidationError
 from cli.core.container import create_container
+from cli.core.host_manager import HostManager
 
 app = typer.Typer()
 
 
+def get_executor_from_context(ctx: typer.Context):
+    """Получить executor из контекста."""
+    host = ctx.obj.get("host") if ctx.obj else None
+    manager = HostManager()
+    return manager.get_executor(host)
+
+
 @app.command()
 def create(
+    ctx: typer.Context,
     name: str = typer.Option(..., "--name", "-n", help="Имя контейнера"),
     cores: Optional[int] = typer.Option(None, "--cores", "-c", help="Количество ядер CPU"),
     memory: Optional[int] = typer.Option(None, "--memory", "-m", help="Память в МБ"),
@@ -39,6 +48,9 @@ def create(
     
     logger.set_context(command="create", name=name)
     
+    # Получаем executor из контекста (--host)
+    executor = get_executor_from_context(ctx)
+    
     result = create_container(
         logger=logger,
         name=name,
@@ -47,7 +59,8 @@ def create(
         disk=disk,
         ip=ip,
         gateway=gateway,
-        gpu=gpu
+        gpu=gpu,
+        executor=executor
     )
     
     if result.success:

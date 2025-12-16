@@ -1,0 +1,152 @@
+# Implementation Plan
+
+- [x] 1. Create CommandExecutor abstraction and LocalExecutor
+  - [x] 1.1 Create `cli/core/executor.py` with CommandExecutor ABC and CommandResult dataclass
+    - Define abstract methods: run(), push_file(), read_file()
+    - Move CommandResult from lib/system.py if needed
+    - _Requirements: 4.1_
+  - [x] 1.2 Implement LocalExecutor class
+    - Implement run() using subprocess
+    - Implement push_file() using shutil.copy
+    - Implement read_file() using Path.read_text()
+    - _Requirements: 4.1_
+  - [x] 1.3 Write property test for LocalExecutor
+    - **Property 2: Executor Command Equivalence** (partial - local only)
+    - Test that run() returns correct exit codes and output
+    - **Validates: Requirements 4.1**
+
+- [x] 2. Implement SSHExecutor
+  - [x] 2.1 Add paramiko to requirements.txt
+    - _Requirements: 4.1_
+  - [x] 2.2 Create SSHExecutor class in `cli/core/executor.py`
+    - Implement connect() with paramiko.SSHClient
+    - Implement run() via exec_command
+    - Implement push_file() via SFTP
+    - Implement read_file() via SFTP
+    - Implement close() for cleanup
+    - _Requirements: 4.1, 4.2_
+  - [x] 2.3 Write property test for file transfer integrity
+    - **Property 5: File Transfer Integrity**
+    - Generate random file content, push via SFTP, read back, verify equality
+    - **Validates: Requirements 4.2**
+
+- [x] 3. Implement SSHConfigParser
+  - [x] 3.1 Create `cli/core/ssh_config.py` with SSHConfigParser class
+    - Implement parse() to read ~/.ssh/config
+    - Implement list_hosts() to return all Host entries
+    - Implement get_host() to return specific host config
+    - _Requirements: 2.1, 2.2_
+  - [x] 3.2 Implement add_host() and remove_host() methods
+    - Write Host block to SSH config
+    - Handle existing hosts (error on duplicate)
+    - Remove Host block by name
+    - _Requirements: 3.1, 3.2, 3.3_
+  - [x] 3.3 Write property test for SSH config round trip
+    - **Property 1: SSH Config Round Trip**
+    - Generate random valid host configs, add to SSH config, read back, verify equivalence
+    - **Validates: Requirements 3.1**
+  - [x] 3.4 Write property test for host list consistency
+    - **Property 3: Host List Consistency**
+    - Generate sequence of add/remove operations, verify final list matches expected
+    - **Validates: Requirements 2.2, 3.1, 3.2**
+
+- [x] 4. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 5. Implement HostManager
+  - [x] 5.1 Create `cli/core/host_manager.py` with HostManager class
+    - Inject SSHConfigParser and ConfigLoader
+    - Implement add(), remove(), list() delegating to SSHConfigParser
+    - Implement test() to verify SSH connection and PVE tools
+    - _Requirements: 2.2, 2.3, 3.1, 3.2_
+  - [x] 5.2 Implement get_executor() method
+    - Return SSHExecutor for named host
+    - Return LocalExecutor when no host specified and no default
+    - Use default_host from config as fallback
+    - _Requirements: 1.1, 1.2_
+  - [x] 5.3 Implement set_default() and get_default() methods
+    - Store default_host in ~/.pve-lxc/config.yaml
+    - Read default_host from config
+    - _Requirements: 2.4_
+  - [x] 5.4 Write property test for default host persistence
+    - **Property 4: Default Host Persistence**
+    - Set default host, read back, verify equality
+    - **Validates: Requirements 2.4**
+
+- [x] 6. Refactor PVE class to use CommandExecutor
+  - [x] 6.1 Modify PVE.__init__ to accept optional executor parameter
+    - Default to LocalExecutor if not provided
+    - _Requirements: 4.1_
+  - [x] 6.2 Update PVE._run() to use executor.run()
+    - Remove direct subprocess calls
+    - _Requirements: 4.1_
+  - [x] 6.3 Update PVE.push() to use executor.push_file()
+    - Handle remote file paths correctly
+    - _Requirements: 4.2_
+
+- [x] 7. Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [x] 8. Implement host CLI commands
+  - [x] 8.1 Create `cli/commands/host.py` with Typer subcommand group
+    - Register as `app.add_typer(host_app, name="host")`
+    - _Requirements: 2.2, 3.1, 3.2_
+  - [x] 8.2 Implement `host add` command
+    - Arguments: name, --hostname, --user (default root), --port (default 22), --key
+    - Call HostManager.add()
+    - _Requirements: 3.1_
+  - [x] 8.3 Implement `host remove` command
+    - Argument: name
+    - Call HostManager.remove()
+    - _Requirements: 3.2_
+  - [x] 8.4 Implement `host list` command
+    - Option: --verbose for PVE version
+    - Call HostManager.list()
+    - Display table with name, hostname, status
+    - _Requirements: 2.2, 5.1, 5.2_
+  - [x] 8.5 Implement `host test` command
+    - Argument: name
+    - Call HostManager.test()
+    - Display connection status and PVE version
+    - _Requirements: 2.3_
+  - [x] 8.6 Implement `host set-default` command
+    - Argument: name
+    - Call HostManager.set_default()
+    - _Requirements: 2.4_
+
+- [x] 9. Add --host flag to existing commands
+  - [x] 9.1 Add --host option to main app callback
+    - Store in context for use by commands
+    - _Requirements: 1.1_
+  - [x] 9.2 Update create command to use host from context
+    - Get executor from HostManager.get_executor(host)
+    - Pass executor to PVE constructor
+    - _Requirements: 1.1, 1.2_
+  - [x] 9.3 Update deploy command to use host from context
+    - Same pattern as create
+    - _Requirements: 1.1, 1.2_
+  - [x] 9.4 Update list command to use host from context
+    - Same pattern as create
+    - _Requirements: 1.1, 1.2_
+  - [x] 9.5 Update destroy command to use host from context
+    - Same pattern as create
+    - _Requirements: 1.1, 1.2_
+  - [x] 9.6 Update bootstrap command to use host from context
+    - Same pattern as create
+    - _Requirements: 1.1, 1.2_
+
+- [x] 10. Error handling and user feedback
+  - [x] 10.1 Create custom exceptions in `lib/exceptions.py`
+    - HostNotFoundError, ConnectionError, PVENotFoundError, AuthenticationError
+    - _Requirements: 1.3, 4.3_
+  - [x] 10.2 Add error handling to SSHExecutor.connect()
+    - Catch paramiko exceptions, wrap in custom exceptions
+    - Include helpful error messages
+    - _Requirements: 1.3_
+  - [x] 10.3 Add error handling to HostManager.get_executor()
+    - Check if host exists in SSH config
+    - Display available hosts on error
+    - _Requirements: 1.3_
+
+- [x] 11. Final Checkpoint - Make sure all tests are passing
+  - Ensure all tests pass, ask the user if questions arise.
