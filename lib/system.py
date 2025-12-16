@@ -6,7 +6,6 @@ from typing import Optional
 import subprocess
 
 from .logger import Logger
-from .platform import OS_TYPE, OSType
 
 
 @dataclass
@@ -73,8 +72,7 @@ class System:
         self.logger.debug(f"Writing file: {path}")
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content)
-        if OS_TYPE != OSType.WINDOWS:
-            path.chmod(mode)
+        path.chmod(mode)
 
     def read_file(self, path: Path) -> str:
         """Прочитать файл."""
@@ -87,5 +85,4 @@ class System:
     def mkdir(self, path: Path, mode: int = 0o755) -> None:
         """Создать директорию."""
         path.mkdir(parents=True, exist_ok=True)
-        if OS_TYPE != OSType.WINDOWS:
-            path.chmod(mode)
+        path.chmod(mode)

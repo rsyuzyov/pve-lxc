@@ -3,6 +3,7 @@
 CLI для управления LXC контейнерами в Proxmox VE.
 
 ## Установка
+Скачать проект в /opt/
 
 ```bash
 sudo ./install.sh
