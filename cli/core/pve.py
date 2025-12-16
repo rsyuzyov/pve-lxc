@@ -7,7 +7,7 @@ import re
 import tempfile
 
 import sys
-sys.path.insert(0, str(__file__).rsplit("/", 3)[0])
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from lib.logger import Logger
 from lib.system import CommandResult
 from cli.core.executor import CommandExecutor, LocalExecutor

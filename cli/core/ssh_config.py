@@ -3,6 +3,10 @@
 from pathlib import Path
 from typing import Optional
 import re
+import sys
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from lib.platform import OS_TYPE, OSType
 
 
 class SSHConfigError(Exception):
@@ -26,7 +30,8 @@ class SSHConfigParser:
         """Записать SSH config."""
         self.config_path.parent.mkdir(parents=True, exist_ok=True)
         self.config_path.write_text(content)
-        self.config_path.chmod(0o600)
+        if OS_TYPE != OSType.WINDOWS:
+            self.config_path.chmod(0o600)
     
     def _parse_hosts(self, content: str) -> list[dict]:
         """Распарсить SSH config в список хостов."""

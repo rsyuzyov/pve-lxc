@@ -1,10 +1,11 @@
 """Высокоуровневые операции с контейнерами."""
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 import sys
-sys.path.insert(0, str(__file__).rsplit("/", 3)[0])
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from lib.logger import Logger
 from lib.config import ConfigLoader
 from .pve import PVE, Container
