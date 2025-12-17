@@ -1,0 +1,7 @@
+app:
+  name: zabbix_agent
+  description: "Zabbix Agent"
+container:
+  cores: 1
+  memory: 512
+  disk: 5

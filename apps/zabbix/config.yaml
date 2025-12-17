@@ -1,0 +1,7 @@
+app:
+  name: zabbix
+  description: "Zabbix Server"
+container:
+  cores: 2
+  memory: 4096
+  disk: 30

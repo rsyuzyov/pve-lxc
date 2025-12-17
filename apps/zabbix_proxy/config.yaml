@@ -1,0 +1,7 @@
+app:
+  name: zabbix_proxy
+  description: "Zabbix Proxy"
+container:
+  cores: 2
+  memory: 2048
+  disk: 20
