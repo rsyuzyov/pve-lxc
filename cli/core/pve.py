@@ -162,10 +162,28 @@ class PVE:
 
     def get_container(self, ctid: int) -> Optional[Container]:
         """Получить информацию о контейнере."""
-        for c in self.list_containers():
-            if c.ctid == ctid:
-                return c
-        return None
+        config = self._get_config(ctid)
+        if not config:
+            return None
+        
+        # Статус получаем через pct status
+        result = self._run(["pct", "status", str(ctid)])
+        status = "unknown"
+        if result.success:
+            if "running" in result.stdout:
+                status = "running"
+            elif "stopped" in result.stdout:
+                status = "stopped"
+        
+        return Container(
+            ctid=ctid,
+            name=config.get("hostname", ""),
+            status=status,
+            ip=config.get("ip"),
+            cores=config.get("cores", 1),
+            memory=config.get("memory", 512),
+            disk=config.get("disk", 8)
+        )
 
     def _get_config(self, ctid: int) -> dict:
         """Получить конфигурацию контейнера."""
@@ -173,14 +191,16 @@ class PVE:
         if not result.success:
             return {}
         
-        config = {}
+        config = {"_exists": True}
         for line in result.stdout.strip().split("\n"):
             if ":" in line:
                 key, value = line.split(":", 1)
                 key = key.strip()
                 value = value.strip()
                 
-                if key == "cores":
+                if key == "hostname":
+                    config["hostname"] = value
+                elif key == "cores":
                     config["cores"] = int(value)
                 elif key == "memory":
                     config["memory"] = int(value)

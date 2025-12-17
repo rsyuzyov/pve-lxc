@@ -6,7 +6,7 @@ _pve_lxc_completion() {
     local prev="${COMP_WORDS[COMP_CWORD-1]}"
     
     # Команды первого уровня
-    local commands="apps bootstrap create deploy destroy host ip list"
+    local commands="apps bootstrap create deploy destroy free-ip host list"
     
     # Подкоманды host
     local host_commands="add list remove set-default test"
@@ -37,8 +37,8 @@ _pve_lxc_completion() {
         bootstrap)
             COMPREPLY=($(compgen -W "--help" -- "$cur"))
             ;;
-        ip)
-            COMPREPLY=($(compgen -W "--help" -- "$cur"))
+        free-ip)
+            COMPREPLY=($(compgen -W "--json --config -C --help" -- "$cur"))
             ;;
         list)
             COMPREPLY=($(compgen -W "--json --help" -- "$cur"))

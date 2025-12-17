@@ -143,25 +143,25 @@ def install_completion(project_dir: Path):
         print_error(f"Файл {completion_src} не найден")
         return
     
-    completion_script = completion_src.read_text()
-    
     # Системная директория для bash completion
     system_completion_dir = Path('/etc/bash_completion.d')
     
     if system_completion_dir.exists() and os.access(system_completion_dir, os.W_OK):
-        # Устанавливаем системно (для всех пользователей)
+        # Устанавливаем симлинк системно (для всех пользователей)
         completion_file = system_completion_dir / 'pve-lxc'
-        completion_file.write_text(completion_script)
-        print_info(f"Установлено в {completion_file}")
-        print_info("Автодополнение будет работать в новых сессиях для всех пользователей")
+        if completion_file.exists() or completion_file.is_symlink():
+            completion_file.unlink()
+        completion_file.symlink_to(completion_src)
+        print_info(f"Симлинк: {completion_file} -> {completion_src}")
     else:
-        # Fallback: устанавливаем для текущего пользователя
+        # Fallback: симлинк для текущего пользователя
         completion_dir = Path.home() / '.local' / 'share' / 'bash-completion' / 'completions'
         completion_dir.mkdir(parents=True, exist_ok=True)
         completion_file = completion_dir / 'pve-lxc'
-        completion_file.write_text(completion_script)
-        print_info(f"Установлено в {completion_file}")
-        print_info("Автодополнение будет работать в новых сессиях")
+        if completion_file.exists() or completion_file.is_symlink():
+            completion_file.unlink()
+        completion_file.symlink_to(completion_src)
+        print_info(f"Симлинк: {completion_file} -> {completion_src}")
 
 
 def fix_zsh_completion_script(script: str, cmd_name: str = 'pve-lxc') -> str:
