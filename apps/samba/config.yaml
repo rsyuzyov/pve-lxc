@@ -1,0 +1,8 @@
+# Samba File Server Configuration
+ad_integration: false
+realm: ""
+domain: ""
+admin_user: "Administrator"
+admin_password: ""
+share_name: "data"
+share_path: "/srv/samba/data"

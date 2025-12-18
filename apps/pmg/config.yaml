@@ -1,0 +1,5 @@
+name: pmg
+description: Proxmox Mail Gateway
+cores: 2
+memory: 2048
+disk: 10

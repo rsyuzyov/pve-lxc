@@ -45,6 +45,7 @@ pve-lxc destroy 101 --force
 | kubernetes | Kubernetes (k3s) |
 | fleet | Fleet Device Management |
 | foreman | Foreman Infrastructure |
+| samba | Samba File Server (ACL + AD) |
 | samba_ad_dc | Samba Active Directory DC |
 
 ### Веб-серверы и Прокси
@@ -104,6 +105,13 @@ pve-lxc destroy 101 --force
 |------------|----------|
 | 1c | 1C:Enterprise Server |
 | syncthing | Syncthing File Sync |
+
+### Почтовые серверы
+| Приложение | Описание |
+|------------|----------|
+| pmg | Proxmox Mail Gateway |
+| iredmail | iRedMail Server |
+| stalwart | Stalwart Mail Server |
 
 ## Конфигурация
 

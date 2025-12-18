@@ -1,0 +1,5 @@
+name: stalwart
+description: Stalwart Mail Server
+cores: 1
+memory: 1024
+disk: 5

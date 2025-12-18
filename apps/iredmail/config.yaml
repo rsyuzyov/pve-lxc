@@ -1,0 +1,5 @@
+name: iredmail
+description: iRedMail Server
+cores: 2
+memory: 2048
+disk: 15
