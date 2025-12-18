@@ -1,0 +1,7 @@
+app:
+  name: fleet
+  description: "Fleet Device Management"
+container:
+  cores: 2
+  memory: 4096
+  disk: 20

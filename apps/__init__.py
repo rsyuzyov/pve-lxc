@@ -22,5 +22,7 @@ from apps.motioneye.install import MotioneyeInstaller
 from apps.shinobi.install import ShinobiInstaller
 from apps.zoneminder.install import ZoneminderInstaller
 from apps.foreman.install import ForemanInstaller
+from apps.fleet.install import FleetInstaller
+from apps.mastra.install import MastraInstaller
 from apps import registry  # noqa: F401
 # 1c не импортируем - имя папки начинается с цифры

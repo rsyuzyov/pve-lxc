@@ -1,0 +1,7 @@
+app:
+  name: mastra
+  description: "Mastra AI Framework"
+container:
+  cores: 2
+  memory: 4096
+  disk: 20

@@ -43,6 +43,7 @@ pve-lxc destroy 101 --force
 | 1c | 1C:Enterprise Server |
 | apache | Apache HTTP Server |
 | docker | Docker Engine |
+| fleet | Fleet Device Management |
 | foreman | Foreman Infrastructure |
 | forgejo | Forgejo Git Server |
 | gitlab | GitLab CE |
@@ -51,6 +52,7 @@ pve-lxc destroy 101 --force
 | kafka | Apache Kafka |
 | kubernetes | Kubernetes (k3s) |
 | mariadb | MariaDB Database |
+| mastra | Mastra AI Framework |
 | mongodb | MongoDB Database |
 | motioneye | MotionEye Surveillance |
 | n8n | n8n Workflow Automation |
@@ -64,6 +66,9 @@ pve-lxc destroy 101 --force
 | supabase | Supabase (Firebase Alternative) |
 | syncthing | Syncthing File Sync |
 | vercel | Vercel CLI |
+| zabbix | Zabbix Server |
+| zabbix-agent | Zabbix Agent |
+| zabbix-proxy | Zabbix Proxy |
 | zoneminder | ZoneMinder Surveillance |
 
 ## Конфигурация
