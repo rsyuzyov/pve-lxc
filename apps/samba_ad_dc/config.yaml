@@ -1,0 +1,7 @@
+app:
+  name: samba_ad_dc
+  description: "Samba Active Directory Domain Controller"
+container:
+  cores: 2
+  memory: 2048
+  disk: 10

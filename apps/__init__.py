@@ -24,5 +24,6 @@ from apps.zoneminder.install import ZoneminderInstaller
 from apps.foreman.install import ForemanInstaller
 from apps.fleet.install import FleetInstaller
 from apps.mastra.install import MastraInstaller
+from apps.samba_ad_dc.install import SambaADDCInstaller
 from apps import registry  # noqa: F401
 # 1c не импортируем - имя папки начинается с цифры

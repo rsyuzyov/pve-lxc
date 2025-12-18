@@ -38,38 +38,72 @@ pve-lxc destroy 101 --force
 
 ## Приложения
 
+### Инфраструктура и Контейнеризация
 | Приложение | Описание |
 |------------|----------|
-| 1c | 1C:Enterprise Server |
-| apache | Apache HTTP Server |
 | docker | Docker Engine |
+| kubernetes | Kubernetes (k3s) |
 | fleet | Fleet Device Management |
 | foreman | Foreman Infrastructure |
+| samba_ad_dc | Samba Active Directory DC |
+
+### Веб-серверы и Прокси
+| Приложение | Описание |
+|------------|----------|
+| apache | Apache HTTP Server |
+| nginx | Nginx Web Server |
+
+### Базы данных
+| Приложение | Описание |
+|------------|----------|
+| mariadb | MariaDB Database |
+| mongodb | MongoDB Database |
+| postgres | PostgreSQL Database |
+| supabase | Supabase (Firebase Alternative) |
+
+### CI/CD и Git
+| Приложение | Описание |
+|------------|----------|
 | forgejo | Forgejo Git Server |
 | gitlab | GitLab CE |
 | gitlab-runner | GitLab Runner |
 | jenkins | Jenkins CI/CD |
+
+### Очереди и Сообщения
+| Приложение | Описание |
+|------------|----------|
 | kafka | Apache Kafka |
-| kubernetes | Kubernetes (k3s) |
-| mariadb | MariaDB Database |
-| mastra | Mastra AI Framework |
-| mongodb | MongoDB Database |
-| motioneye | MotionEye Surveillance |
-| n8n | n8n Workflow Automation |
 | nats | NATS Message Broker |
-| nginx | Nginx Web Server |
-| postgres | PostgreSQL Database |
-| prometheus | Prometheus Monitoring |
 | rabbitmq | RabbitMQ Message Broker |
-| railway | Railway CLI |
-| shinobi | Shinobi Surveillance |
-| supabase | Supabase (Firebase Alternative) |
-| syncthing | Syncthing File Sync |
-| vercel | Vercel CLI |
+
+### Мониторинг
+| Приложение | Описание |
+|------------|----------|
+| prometheus | Prometheus Monitoring |
 | zabbix | Zabbix Server |
-| zabbix-agent | Zabbix Agent |
-| zabbix-proxy | Zabbix Proxy |
+| zabbix_agent | Zabbix Agent |
+| zabbix_proxy | Zabbix Proxy |
+
+### Автоматизация и Разработка
+| Приложение | Описание |
+|------------|----------|
+| n8n | n8n Workflow Automation |
+| mastra | Mastra AI Framework |
+| railway | Railway CLI |
+| vercel | Vercel CLI |
+
+### Видеонаблюдение
+| Приложение | Описание |
+|------------|----------|
+| motioneye | MotionEye Surveillance |
+| shinobi | Shinobi Surveillance |
 | zoneminder | ZoneMinder Surveillance |
+
+### Другое
+| Приложение | Описание |
+|------------|----------|
+| 1c | 1C:Enterprise Server |
+| syncthing | Syncthing File Sync |
 
 ## Конфигурация
 
