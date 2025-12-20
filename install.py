@@ -174,6 +174,7 @@ def install_completion(project_dir: Path):
             completion_file.unlink()
         completion_file.symlink_to(completion_src)
         print_info(f"Симлинк: {completion_file} -> {completion_src}")
+        return completion_file
     else:
         # Fallback: симлинк для текущего пользователя
         completion_dir = Path.home() / '.local' / 'share' / 'bash-completion' / 'completions'
@@ -183,6 +184,7 @@ def install_completion(project_dir: Path):
             completion_file.unlink()
         completion_file.symlink_to(completion_src)
         print_info(f"Симлинк: {completion_file} -> {completion_src}")
+        return completion_file
 
 
 def fix_zsh_completion_script(script: str, cmd_name: str = 'pve-lxc') -> str:
@@ -223,13 +225,15 @@ def install_zsh_completion(project_dir: Path):
             completion_file = zsh_dir / '_pve-lxc'
             completion_file.write_text(completion_script)
             print_info(f"Zsh completion: {completion_file}")
-            return
+            return completion_file
     
     # Fallback для пользователя
     user_zsh_dir = Path.home() / '.zsh' / 'completions'
     user_zsh_dir.mkdir(parents=True, exist_ok=True)
     completion_file = user_zsh_dir / '_pve-lxc'
     completion_file.write_text(completion_script)
+    print_info(f"Zsh completion: {completion_file}")
+    return completion_file
 
 
 def main():
@@ -238,10 +242,19 @@ def main():
     project_dir = Path(__file__).parent.resolve()
     create_venv(project_dir)
     create_symlink(project_dir)
-    install_completion(project_dir)
+    bash_completion = install_completion(project_dir)
+    zsh_completion = install_zsh_completion(project_dir)
     
     print_info("Установка завершена")
     print_info("Запуск: pve-lxc --help")
+    
+    print("\n" + "="*50)
+    print(f"{Colors.GREEN}Для включения автодополнения в текущей сессии:{Colors.NC}")
+    if bash_completion:
+        print(f"Bash: source {bash_completion}")
+    if zsh_completion:
+        print(f"Zsh:  source {zsh_completion}  (или compinit)")
+    print("="*50 + "\n")
 
 
 if __name__ == '__main__':
