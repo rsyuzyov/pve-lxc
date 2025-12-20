@@ -33,7 +33,28 @@ def create_venv(project_dir: Path):
     
     if not venv_dir.exists():
         print_step(f"Создание venv: {venv_dir}")
-        subprocess.run([sys.executable, '-m', 'venv', str(venv_dir)], check=True)
+        try:
+            subprocess.run([sys.executable, '-m', 'venv', str(venv_dir)], check=True)
+        except subprocess.CalledProcessError:
+            print_info("ensurepip недоступен или ошибка создания venv. Пробуем fallback...")
+            # Удаляем частично созданный venv если есть, хотя venv обычно чистит за собой или падает до
+            if venv_dir.exists():
+                import shutil
+                shutil.rmtree(venv_dir)
+            
+            # Создаем без pip
+            subprocess.run([sys.executable, '-m', 'venv', '--without-pip', str(venv_dir)], check=True)
+            
+            # Качаем и ставим pip
+            get_pip_path = venv_dir / 'get-pip.py'
+            print_step("Скачивание get-pip.py...")
+            subprocess.run(['curl', '-fsSL', 'https://bootstrap.pypa.io/get-pip.py', '-o', str(get_pip_path)], check=True)
+            
+            print_step("Ручная установка pip...")
+            subprocess.run([str(venv_dir / 'bin' / 'python'), str(get_pip_path)], check=True)
+            
+            if get_pip_path.exists():
+                get_pip_path.unlink()
     else:
         print_info(f"venv уже существует: {venv_dir}")
     

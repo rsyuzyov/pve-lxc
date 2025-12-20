@@ -1,4 +1,0 @@
-# file: /root/run-in-lxc/lib/config.py
-# hypothesis_version: 6.148.7
-
-[1.0, 2048, '.', '.pve-lxc', 'ConfigLoader', 'INFO', 'UTC', 'apps', 'bootstrap', 'bridge', 'config.yaml', 'container', 'cores', 'curl', 'debian-12-standard', 'disk', 'en_US.UTF-8', 'git', 'htop', 'json', 'level', 'local-lvm', 'locale', 'logging', 'memory', 'network', 'packages', 'ping_timeout', 'problem_mark', 'storage', 'template', 'timezone', 'vim', 'vmbr0', 'wget']

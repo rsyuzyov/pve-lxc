@@ -1,4 +1,0 @@
-# file: /root/run-in-lxc/lib/logger.py
-# hypothesis_version: 6.148.7
-
-['\x1b[0;31m', '\x1b[0;32m', '\x1b[0;34m', '\x1b[0;37m', '\x1b[0m', '\x1b[1;33m', '+00:00', 'Command completed', 'Command failed', 'DEBUG', 'ERROR', 'FAILED', 'INFO', 'SUCCESS', 'WARN', 'Z', 'context', 'error_code', 'level', 'message', 'success', 'timestamp']
